@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { use } from "react";
+import SEOResearch from "@/components/SEOResearch";
 
 interface Blog {
   id: string;
@@ -64,8 +65,17 @@ export default function BlogSEO({
       // Extract text content from the blog
       const textContent = blog.content
         .map((section: any) => {
-          const content = JSON.parse(section);
-          return content.description || "";
+          if (typeof section === "string") {
+            try {
+              const parsed = JSON.parse(section);
+              return parsed.description || "";
+            } catch {
+              return section;
+            }
+          } else if (typeof section === "object") {
+            return section.description || "";
+          }
+          return "";
         })
         .join(" ")
         .toLowerCase();
@@ -170,6 +180,33 @@ export default function BlogSEO({
       <h1 className="text-3xl font-bold mb-6">{blog.title}</h1>
 
       <div className="grid gap-8">
+        <div className="border p-6 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">SEO Analysis</h2>
+          <SEOResearch
+            content={blog.content
+              .map((section: any) => {
+                if (typeof section === "string") {
+                  try {
+                    const parsed = JSON.parse(section);
+                    return parsed.description || "";
+                  } catch {
+                    return section;
+                  }
+                } else if (typeof section === "object") {
+                  return section.description || "";
+                }
+                return "";
+              })
+              .join(" ")}
+            onKeywordsSelected={(primary, secondary) => {
+              setSelectedKeywords({
+                primaryKeywords: primary,
+                secondaryKeywords: secondary,
+              });
+            }}
+          />
+        </div>
+
         <div className="border p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-4">Current SEO Settings</h2>
           <div className="space-y-4">
