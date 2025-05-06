@@ -28,13 +28,7 @@ export async function GET(
     return NextResponse.json(blog);
   } catch (error) {
     console.error("Error fetching blog:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to fetch blog",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error fetching blog" }, { status: 500 });
   }
 }
 
@@ -45,24 +39,25 @@ export async function PATCH(
   try {
     const { seo } = await request.json();
 
+    // Ensure the SEO object has all required fields
+    const updatedSeo = {
+      ...seo,
+      primaryKeywordsNew: seo.primaryKeywordsNew || [],
+      secondaryKeywordsNew: seo.secondaryKeywordsNew || [],
+    };
+
     const updatedBlog = await prisma.blogs.update({
       where: {
         id: params.id,
       },
       data: {
-        seo,
+        seo: updatedSeo,
       },
     });
 
     return NextResponse.json(updatedBlog);
   } catch (error) {
     console.error("Error updating blog:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to update blog",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error updating blog" }, { status: 500 });
   }
 }
