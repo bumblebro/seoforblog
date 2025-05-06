@@ -8,16 +8,20 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const blog = await prisma.blogs.findUnique({
+    const blog = await prisma.foodBlogs.findUnique({
       where: {
         id: params.id,
       },
       select: {
         id: true,
         title: true,
-        slug: true,
         content: true,
         seo: true,
+        recipedescription: true,
+        instructions: true,
+        recipedetails: true,
+        faq: true,
+        equipments: true,
       },
     });
 
@@ -28,7 +32,13 @@ export async function GET(
     return NextResponse.json(blog);
   } catch (error) {
     console.error("Error fetching blog:", error);
-    return NextResponse.json({ error: "Error fetching blog" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Failed to fetch blog",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -37,27 +47,22 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { seo } = await request.json();
-
-    // Ensure the SEO object has all required fields
-    const updatedSeo = {
-      ...seo,
-      primaryKeywordsNew: seo.primaryKeywordsNew || [],
-      secondaryKeywordsNew: seo.secondaryKeywordsNew || [],
-    };
-
-    const updatedBlog = await prisma.blogs.update({
+    const body = await request.json();
+    const updatedBlog = await prisma.foodBlogs.update({
       where: {
         id: params.id,
       },
-      data: {
-        seo: updatedSeo,
-      },
+      data: body,
     });
-
     return NextResponse.json(updatedBlog);
   } catch (error) {
     console.error("Error updating blog:", error);
-    return NextResponse.json({ error: "Error updating blog" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Failed to update blog",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }

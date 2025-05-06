@@ -7,6 +7,12 @@ interface Blog {
   id: string;
   title: string;
   slug: string;
+  content: any[];
+  recipedescription: string;
+  instructions: string[];
+  recipedetails: any;
+  faq: any;
+  equipments: string[];
   seo: {
     primaryKeywords?: string[];
     secondaryKeywords?: string[];

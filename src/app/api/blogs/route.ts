@@ -5,12 +5,17 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const blogs = await prisma.blogs.findMany({
+    const blogs = await prisma.foodBlogs.findMany({
       select: {
         id: true,
         title: true,
         content: true,
         seo: true,
+        recipedescription: true,
+        instructions: true,
+        recipedetails: true,
+        faq: true,
+        equipments: true,
       },
     });
     return NextResponse.json(blogs);
